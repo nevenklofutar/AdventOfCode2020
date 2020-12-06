@@ -20,5 +20,17 @@ namespace Solutions.UnitTest {
 
             Assert.That(res, Is.EqualTo(result));
         }
+
+        [Test]
+        [TestCase("Input06a.txt", 6)]
+        [TestCase("Input06b.txt", 3394)]
+        public void GetResultTwo_WhenCalled_ReturnsResult(string filePath, int result) {
+
+            var solution = new Solution06();
+
+            var res = solution.GetSolutionTwo(filePath);
+
+            Assert.That(res, Is.EqualTo(result));
+        }
     }
 }

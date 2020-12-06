@@ -17,6 +17,16 @@ namespace Solutions.Classes {
             return result;
         }
 
+        public int GetSolutionTwo(string filePath) {
+
+            int result = 0;
+
+            IEnumerable<string> data = GetDataTwo(filePath);
+            result = GetResultTwo(data);
+
+            return result;
+        }
+
         private IList<string> GetDataOne(string filePath) {
 
             IEnumerable<string> data = File.ReadAllLines(Directory.GetCurrentDirectory() + "/Inputs/" + filePath);
@@ -62,5 +72,67 @@ namespace Solutions.Classes {
             return result;
         }
 
+        private IEnumerable<string> GetDataTwo(string filePath) {
+
+            return File.ReadAllLines(Directory.GetCurrentDirectory() + "/Inputs/" + filePath);
+        }
+
+        private int GetResultTwo(IEnumerable<string> data) {
+
+            // for each group get first answer, and then check if all others have
+            // aswers that match first person answers
+
+            int result = 0;
+            Dictionary<char, int> firstPersonAnswers = null;
+            int groupPersonsCount = 1;
+
+            foreach (var answers in data) {
+
+                if (string.IsNullOrEmpty(answers)) {
+                    // for current group, calculate answers
+                    result += CalculateGroupAnswers(groupPersonsCount, firstPersonAnswers);
+                    // reset group on empty line
+                    firstPersonAnswers = null;
+                    groupPersonsCount = 1;
+                    continue;
+                }
+
+                // if new group, get first persons answers as a reference
+                if (firstPersonAnswers == null) {
+                    firstPersonAnswers = new Dictionary<char, int>();
+
+                    foreach (var answer in answers) {
+                        firstPersonAnswers[answer] = 1;
+                    }
+
+                    continue;
+                }
+
+                // calculat subsequent persons from the same group according to the first person in the group
+                groupPersonsCount++;
+                foreach (var answer in answers) {
+                    if (firstPersonAnswers.ContainsKey(answer))
+                        firstPersonAnswers[answer] += 1;
+                }
+
+            }
+
+            // for last group, calculate answers
+            result += CalculateGroupAnswers(groupPersonsCount, firstPersonAnswers);
+
+            return result;
+        }
+
+        private int CalculateGroupAnswers(int groupPersonsCount, Dictionary<char, int> firstPersonAnswers) {
+
+            int result = 0;
+
+            foreach (var answer in firstPersonAnswers.Keys) {
+                if (firstPersonAnswers[answer] == groupPersonsCount)
+                    result++;
+            }
+
+            return result;
+        }
     }
 }
