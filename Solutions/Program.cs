@@ -26,9 +26,13 @@ namespace Solutions {
             //int result = s.GetSolutionOne("Input06b.txt");
             //int result = s.GetSolutionTwo("Input06b.txt");
 
-            Solution07 s = new Solution07();
+            //Solution07 s = new Solution07();
             //int result = s.GetSolutionOne("Input07b.txt");
-            int result = s.GetSolutionTwo("Input07b.txt");
+            //int result = s.GetSolutionTwo("Input07b.txt");
+
+            Solution08 s = new Solution08();
+            //int result = s.GetSolutionOne("Input08b.txt");
+            int result = s.GetSolutionTwo("Input08b.txt");
 
             Console.WriteLine(result);
 
