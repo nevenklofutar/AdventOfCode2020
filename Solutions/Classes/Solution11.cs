@@ -34,6 +34,28 @@ namespace Solutions.Classes {
             return GetSeatsCount(data, seatTaken);
         }
 
+        public int GetSolutionTwo(string filePath) {
+
+            char[,] data = GetData(filePath);
+            char[,] newdata; // = MakeNewData(data.Count, data[0].Length);
+            int counter = 0;
+
+
+            while (true) {
+
+                newdata = ProcessDataSolutionTwo(data);
+                counter++;
+
+                if (AreSeatingArrangemetsSame(data, newdata)) {
+                    break;
+                }
+
+                data = (char[,])newdata.Clone();
+            }
+
+            return GetSeatsCount(data, seatTaken);
+        }
+
         private char[,] GetData(string filePath) {
             string[] data = File.ReadAllLines(Directory.GetCurrentDirectory() + "/Inputs/" + filePath);
 
@@ -82,6 +104,40 @@ namespace Solutions.Classes {
             return newData;
         }
 
+        private char[,] ProcessDataSolutionTwo(char[,] sourceData) {
+
+            int dataRowCount = sourceData.GetLength(0);
+            int dataColCount = sourceData.GetLength(1);
+
+            char[,] newData = (char[,])sourceData.Clone(); // MakeNewData(dataRowCount, dataColCount);
+
+            for (int rowIndex = 0; rowIndex < dataRowCount; rowIndex++) {
+                for (int colIndex = 0; colIndex < dataColCount; colIndex++) {
+
+                    char currentSeat = sourceData[rowIndex, colIndex];
+
+                    if (currentSeat == seatFloor)
+                        continue;
+
+                    int adjecentOccupiedSeatsCount = GetOccupiedSeatsAroundCount(ref sourceData, rowIndex, colIndex);
+
+                    // If a seat is empty(L) and there are no occupied seats adjacent to it, the seat becomes occupied.
+                    if (currentSeat == seatFree && adjecentOccupiedSeatsCount == 0)
+                        newData[rowIndex, colIndex] = seatTaken;
+
+                    // If a seat is occupied(#) and four or more seats adjacent to it are also occupied, the seat becomes empty.
+                    else if (currentSeat == seatTaken && adjecentOccupiedSeatsCount >= 5)
+                        newData[rowIndex, colIndex] = seatFree;
+
+                    // Otherwise, the seat's state does not change.
+                    else
+                        newData[rowIndex, colIndex] = sourceData[rowIndex, colIndex];
+                }
+            }
+
+            return newData;
+        }
+
         private int GetAdjecentOccupiedSeatsCount(ref char[,] data, int rowIndex, int colIndex) {
 
             int seatsCount = 0;
@@ -101,17 +157,59 @@ namespace Solutions.Classes {
             return seatsCount;
         }
 
-        private char[,] MakeNewData(int rowCount, int colCount) {
+        private int GetOccupiedSeatsAroundCount(ref char[,] data, int rowIndex, int colIndex) {
 
-            char[,] result = new char[rowCount, colCount];
+            int seatsCount = 0;
 
-            for (int i = 0; i < rowCount; i++) { 
-                for (int j = 0; j < colCount; j++) {
-                    result[i, j] = '-';
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, -1, -1))
+                seatsCount++;
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, -1, 0))
+                seatsCount++;
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, -1, +1))
+                seatsCount++;
+
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, 0, -1))
+                seatsCount++;
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, 0, +1))
+                seatsCount++;
+
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, +1, -1))
+                seatsCount++;
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, +1, 0))
+                seatsCount++;
+            if (IsNextVisibleSeatTaken(ref data, rowIndex, colIndex, +1, +1))
+                seatsCount++;
+
+            return seatsCount;
+        }
+
+        private bool IsNextVisibleSeatTaken(ref char[,] data, int rowStart, int colStart, int rowDirection, int colDirection) {
+
+            int dataRowCount = data.GetLength(0);
+            int dataColCount = data.GetLength(1);
+
+            int row = rowStart + rowDirection;
+            int col = colStart + colDirection;
+
+            while (row >= 0 && row < dataRowCount && col >= 0 && col < dataColCount) {
+                
+                char currentSeat = data[row, col];
+
+                if (currentSeat == seatFloor) {
+                    row += rowDirection;
+                    col += colDirection;
+                    continue;
                 }
+                else if (currentSeat == seatFree)
+                    return false;
+                else if (currentSeat == seatTaken)
+                    return true;
+
+                row += rowDirection;
+                col += colDirection;
             }
 
-            return result;
+            return false;
         }
 
         private bool AreSeatingArrangemetsSame(char[,] dataOne, char[,] dataTwo) {
