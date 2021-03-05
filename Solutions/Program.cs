@@ -44,9 +44,12 @@ namespace Solutions {
             //long result = s.GetSolutionTwo("Input10a.txt");
             //long result = s.GetSolutionThree"Input10a.txt");
 
-            Solution11 s = new Solution11();
+            //Solution11 s = new Solution11();
             //int result = s.GetSolutionOne("Input11b.txt");
-            int result = s.GetSolutionTwo("Input11b.txt");
+            //int result = s.GetSolutionTwo("Input11b.txt");
+
+            Solution12 s = new Solution12();
+            int result = s.GetSolutionOne("Input12b.txt");
 
             Console.WriteLine(result);
 
